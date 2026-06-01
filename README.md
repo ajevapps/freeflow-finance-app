@@ -1,2 +1,9 @@
-# free-flow-fiance
-Figuring it out
+# FreeFlow Finance App
+
+## Install
+
+npm install
+
+## Run
+
+npm run dev
