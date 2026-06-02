@@ -1,105 +1,161 @@
-# FreeFlow 💸
+# FreeFlow
 
-A modern personal finance and cashflow forecasting app built with **React, Vite, and Tailwind CSS**.
+FreeFlow is a modern personal finance and cashflow planning app designed around **how people actually get paid**.
 
-FreeFlow is designed to help users manage income, expenses, bills, savings, debt, and future cashflow in one place — with a strong focus on **pay-cycle planning and financial visibility**.
+Instead of traditional monthly budgeting, FreeFlow works from your **real pay cycle** — weekly, fortnightly or monthly — to show exactly:
+
+* How much income hits your account
+* What bills should be allocated this pay
+* What is truly disposable
+* When expensive periods are coming
+
+Built for Australians first, with support for **PAYG withholding, Medicare Levy and HECS/HELP estimates**.
 
 ---
 
-## Features (Planned)
+## Features
+
+### Income Planning
+
+Track income and estimate **real take-home pay** using Australian payroll-style withholding.
+
+Includes:
+
+* PAYG tax withholding
+* Medicare Levy
+* HECS/HELP repayment assumptions
+* Weekly, fortnightly and monthly income support
+* Take-home pay preview
+
+---
+
+### Smart Expense Planning
+
+FreeFlow smooths expenses across your actual pay cycle.
+
+Examples:
+
+**Fortnightly pay**
+
+Monthly bill:
+
+```txt
+Netflix $30/month
+```
+
+2-pay month:
+
+```txt
+$15 per pay
+```
+
+3-pay month:
+
+```txt
+$10 per pay
+```
+
+Yearly bills are automatically smoothed across the year:
+
+```txt
+Car Registration $780/year
+≈ $30 per fortnight
+```
+
+No more surprise bills.
+
+---
+
+### Expense Planner Calendar
+
+Visualise recurring expenses in a modern calendar view.
+
+Features:
+
+* Recurring expenses
+* Weekly / fortnightly / monthly / yearly support
+* Bill editing
+* Bill scheduling
+* Account-linked expenses
+
+---
 
 ### Dashboard
-- Financial overview
-- Total balances
-- Monthly income vs expenses
-- Disposable income tracking
-- Quick financial insights
 
-### Accounts
-- Transaction accounts
-- Savings accounts
-- Credit cards
-- Loans & mortgages
-- Investment tracking
+A pay-cycle-first dashboard showing:
 
-### Income & Pay Cycles
-- Weekly, fortnightly, monthly income
-- Multiple income sources
-- Salary tracking
-- Pay frequency conversions
+* **Income This Pay**
+* **Bills This Pay**
+* **Disposable Income**
+* **Budget Health**
+* **Need / Want / Save split**
 
-### Expenses & Bills
-- Recurring expenses
-- Upcoming bills
-- Categories & tracking
-- Budget visibility
+Designed to answer:
 
-### Savings Goals
-- Goal tracking
-- Progress monitoring
-- Emergency fund planning
+> “How much money do I actually have this pay?”
 
-### Debt Tracking
-- Loans and liabilities
-- Remaining balances
-- Repayment visibility
+---
 
-### Forecasting
-- Future balance prediction
-- Cashflow simulation
-- Pay-cycle forecasting
-- Expense modelling
+### Account Management
 
-### Reports
-- Spending trends
-- Financial summaries
-- Savings performance
-- Budget insights
+Track balances across:
+
+* Transaction accounts
+* Bills accounts
+* Savings accounts
+
+---
+
+### Local Persistence
+
+FreeFlow stores data locally in your browser.
+
+Your:
+
+* Accounts
+* Expenses
+* Income
+* Settings
+
+persist automatically.
 
 ---
 
 ## Tech Stack
 
-- **React**
-- **Vite**
-- **Tailwind CSS**
-- **React Router DOM**
+Built using:
+
+* React
+* Vite
+* React Router
+* FullCalendar
+* Recharts
+* Local Storage
 
 ---
 
-## Project Structure
+## Installation
 
-```txt
-src/
-├── components/
-├── context/
-├── data/
-├── hooks/
-├── layouts/
-├── pages/
-├── styles/
-├── utils/
-├── App.jsx
-└── main.jsx
-````
+Clone the repository:
 
----
+```bash
+git clone <your-repo-url>
+cd freeflow
+```
 
-## Getting Started
-
-### Install dependencies
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-### Start development server
+Run development server:
 
 ```bash
 npm run dev
 ```
 
-### Build for production
+Build production version:
 
 ```bash
 npm run build
@@ -107,24 +163,51 @@ npm run build
 
 ---
 
-## Project Status
+## Current Status
 
-🚧 **In Development**
+FreeFlow is currently in **MVP / Beta**.
 
-This project is currently being built incrementally, with each component and page developed step-by-step.
+Core systems complete:
+
+* Income engine
+* Pay-cycle budgeting
+* Expense planner
+* Australian tax estimates
+* Dashboard
+* Forecast foundations
+* Settings
+
+Upcoming:
+
+* Reports
+* Cashflow forecasting
+* Savings goals
+* Export / backup
+* Notifications
+* Mobile optimisation
 
 ---
 
-## Vision
+## Philosophy
 
-FreeFlow aims to make personal finance easier to understand by focusing on:
+Most budgeting apps think in:
 
-* Real cashflow visibility
-* Pay-cycle awareness
-* Future financial forecasting
-* Simple, modern design
-* Clear financial decision-making
+> Monthly averages
+
+FreeFlow thinks in:
+
+> Real paydays.
+
+Because budgeting should answer:
+
+> “Can I afford this pay cycle?”
+
+—not just:
+
+> “How much do I spend each month?”
 
 ---
 
-Built with caffeine and financial anxiety.
+## License
+
+Private project – all rights reserved.
