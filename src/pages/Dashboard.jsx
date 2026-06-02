@@ -1,34 +1,55 @@
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 
 import { useApp } from '../context/AppContext';
 
 function Dashboard() {
   const {
     dashboard,
-    expenses,
-    accounts,
-    settings,
-  } = useApp();
+    expenses = [],
+    accounts = [],
+    settings = {},
+  } = useApp() || {};
 
   const {
-    totalBalance,
-    incomeThisPay,
-    billsThisPay,
-    disposableIncome,
-    budgetHealth,
-  } = dashboard;
+    incomeThisPay = 0,
+    billsThisPay = 0,
+    disposableIncome = 0,
+    budgetHealth = {
+      status: 'healthy',
+      message:
+        'Everything looks good.',
+    },
+  } = dashboard || {};
 
   const categoryTotals =
     expenses.reduce(
-      (totals, expense) => {
+      (
+        totals,
+        expense
+      ) => {
         const amount =
           Number(
             expense.amount
           ) || 0;
 
-        totals[
-          expense.category
-        ] += amount;
+        const category =
+          expense.category?.toLowerCase();
+
+        if (
+          totals[
+            category
+          ] !== undefined
+        ) {
+          totals[
+            category
+          ] += amount;
+        }
 
         return totals;
       },
@@ -64,9 +85,11 @@ function Dashboard() {
   ];
 
   const formatCurrency = (
-    value
+    value = 0
   ) =>
-    value.toLocaleString(
+    Number(
+      value
+    ).toLocaleString(
       'en-AU',
       {
         style: 'currency',
@@ -130,7 +153,7 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* ACCOUNTS */}
+      {/* FUND THESE ACCOUNTS */}
       <div
         className="card"
         style={{
@@ -146,33 +169,56 @@ function Dashboard() {
 
         <div className="account-list">
           {accounts.map(
-            (account) => (
-              <div
-                key={
-                  account.id
-                }
-                className="account-row"
-              >
-                <div>
-                  <p className="account-name">
-                    {
-                      account.name
-                    }
-                  </p>
+            (account) => {
+              const neededThisPay =
+                expenses
+                  .filter(
+                    (
+                      expense
+                    ) =>
+                      expense.accountId ===
+                      account.id
+                  )
+                  .reduce(
+                    (
+                      total,
+                      expense
+                    ) =>
+                      total +
+                      (Number(
+                        expense.payAllocation
+                      ) || 0),
+                    0
+                  );
 
-                  <p className="page-subtitle">
-                    Current
-                    balance
-                  </p>
+              return (
+                <div
+                  key={
+                    account.id
+                  }
+                  className="account-row"
+                >
+                  <div>
+                    <p className="account-name">
+                      {
+                        account.name
+                      }
+                    </p>
+
+                    <p className="page-subtitle">
+                      Needed
+                      this pay
+                    </p>
+                  </div>
+
+                  <strong>
+                    {formatCurrency(
+                      neededThisPay
+                    )}
+                  </strong>
                 </div>
-
-                <strong>
-                  {formatCurrency(
-                    account.balance
-                  )}
-                </strong>
-              </div>
-            )
+              );
+            }
           )}
         </div>
       </div>
@@ -191,7 +237,9 @@ function Dashboard() {
         </div>
 
         <div
-          className={`health-card ${budgetHealth.status}`}
+          className={`health-card ${
+            budgetHealth.status
+          }`}
         >
           <h3>
             {budgetHealth.status ===
@@ -228,10 +276,13 @@ function Dashboard() {
         <div
           style={{
             width: '100%',
-            height: 300,
+            height: 320,
           }}
         >
-          <ResponsiveContainer>
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+          >
             <PieChart>
               <Pie
                 data={
