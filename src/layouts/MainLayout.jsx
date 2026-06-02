@@ -1,24 +1,28 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, NavLink } from 'react-router-dom';
 
-import Sidebar from "../components/Sidebar";
-import Topbar from "../components/Topbar";
-
-export default function MainLayout() {
+function MainLayout() {
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      {/* Sidebar */}
-      <Sidebar />
+    <div className="app-layout">
+      <aside className="sidebar">
+        <h2>FreeFlow</h2>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-screen">
-        {/* Top Navigation */}
-        <Topbar />
+        <nav>
+          <NavLink to="/dashboard">Dashboard</NavLink>
+          <NavLink to="/expenses">Expenses</NavLink>
+          <NavLink to="/income">Income</NavLink>
+          <NavLink to="/accounts">Accounts</NavLink>
+          <NavLink to="/forecast">Forecast</NavLink>
+          <NavLink to="/savings">Savings</NavLink>
+          <NavLink to="/reports">Reports</NavLink>
+          <NavLink to="/settings">Settings</NavLink>
+        </nav>
+      </aside>
 
-        {/* Page Content */}
-        <main className="flex-1 p-6 overflow-y-auto">
-          <Outlet />
-        </main>
-      </div>
+      <main className="main-content">
+        <Outlet />
+      </main>
     </div>
   );
 }
+
+export default MainLayout;
