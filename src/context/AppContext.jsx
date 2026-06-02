@@ -70,7 +70,7 @@ export function AppProvider({
   children,
 }) {
   // ======================================
-  // STATE WITH FALLBACK DATA
+  // STATE
   // ======================================
 
   const [accounts, setAccounts] =
@@ -168,7 +168,7 @@ export function AppProvider({
     );
 
   // ======================================
-  // AUTO SAVE TO LOCAL STORAGE
+  // AUTO SAVE
   // ======================================
 
   useEffect(() => {
