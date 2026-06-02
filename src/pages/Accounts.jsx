@@ -1,28 +1,194 @@
-export default function Accounts() {
+import { useState } from 'react';
+import { useApp } from '../context/AppContext';
+
+function Accounts() {
+  const {
+    accounts,
+    addAccount,
+    deleteAccount,
+  } = useApp();
+
+  const [name, setName] =
+    useState('');
+
+  const [balance, setBalance] =
+    useState('');
+
+  const [type, setType] =
+    useState('transaction');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!name.trim()) return;
+
+    addAccount({
+      name,
+      balance:
+        Number(balance) || 0,
+      type,
+    });
+
+    setName('');
+    setBalance('');
+    setType('transaction');
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">
+    <div className="page">
+      <div className="page-header">
+        <h1 className="page-title">
           Accounts
         </h1>
 
-        <p className="text-gray-500 mt-1">
-          Manage your bank accounts, savings,
-          loans, and credit cards.
+        <p className="page-subtitle">
+          Manage the accounts used
+          for budgeting and payday
+          allocations.
         </p>
       </div>
 
-      {/* Placeholder Content */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-800">
-          Your Accounts
-        </h2>
+      {/* Add Account */}
+      <div className="card">
+        <div className="card-header">
+          <h2>Add Account</h2>
+        </div>
 
-        <p className="text-gray-500 mt-2">
-          No accounts added yet.
-        </p>
+        <form
+          className="account-form"
+          onSubmit={
+            handleSubmit
+          }
+        >
+          <input
+            type="text"
+            placeholder="Account name"
+            value={name}
+            onChange={(e) =>
+              setName(
+                e.target.value
+              )
+            }
+          />
+
+          <input
+            type="number"
+            placeholder="Balance"
+            value={balance}
+            onChange={(e) =>
+              setBalance(
+                e.target.value
+              )
+            }
+          />
+
+          <select
+            value={type}
+            onChange={(e) =>
+              setType(
+                e.target.value
+              )
+            }
+          >
+            <option value="transaction">
+              Transaction
+            </option>
+
+            <option value="bills">
+              Bills
+            </option>
+
+            <option value="savings">
+              Savings
+            </option>
+
+            <option value="offset">
+              Offset
+            </option>
+          </select>
+
+          <button
+            type="submit"
+            className="primary-button"
+          >
+            Add Account
+          </button>
+        </form>
+      </div>
+
+      {/* Account List */}
+      <div
+        className="card"
+        style={{
+          marginTop: '1.5rem',
+        }}
+      >
+        <div className="card-header">
+          <h2>
+            Your Accounts
+          </h2>
+        </div>
+
+        {accounts.length ===
+        0 ? (
+          <p className="page-subtitle">
+            No accounts added yet.
+          </p>
+        ) : (
+          <div className="account-list">
+            {accounts.map(
+              (account) => (
+                <div
+                  key={
+                    account.id
+                  }
+                  className="account-row"
+                >
+                  <div>
+                    <p className="account-name">
+                      {
+                        account.name
+                      }
+                    </p>
+
+                    <p className="account-balance">
+                      $
+                      {Number(
+                        account.balance
+                      ).toLocaleString()}
+                    </p>
+                  </div>
+
+                  <div
+                    className="account-actions"
+                  >
+                    <span
+                      className="account-type"
+                    >
+                      {
+                        account.type
+                      }
+                    </span>
+
+                    <button
+                      onClick={() =>
+                        deleteAccount(
+                          account.id
+                        )
+                      }
+                      className="danger-button"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              )
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
+export default Accounts;

@@ -250,3 +250,77 @@ body {
     gap: 2rem;
   }
 }
+.account-form {
+  display: grid;
+  grid-template-columns:
+    2fr
+    1fr
+    1fr
+    auto;
+  gap: 1rem;
+}
+
+.account-form input,
+.account-form select {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid
+    var(--border);
+  color: white;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  font-size: 1rem;
+}
+
+.primary-button {
+  border: none;
+  background: var(--accent);
+  color: white;
+  padding: 0.9rem 1.2rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.primary-button:hover {
+  opacity: 0.9;
+}
+
+.account-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.account-type {
+  color: var(--muted);
+  text-transform: capitalize;
+}
+
+.danger-button {
+  border: none;
+  background: rgba(
+    239,
+    68,
+    68,
+    0.15
+  );
+  color: #ef4444;
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.danger-button:hover {
+  background: rgba(
+    239,
+    68,
+    68,
+    0.25
+  );
+}
+
+@media (max-width: 900px) {
+  .account-form {
+    grid-template-columns: 1fr;
+  }
+}

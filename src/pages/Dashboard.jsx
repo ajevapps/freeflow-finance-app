@@ -1,81 +1,76 @@
+import { useApp } from '../context/AppContext';
+
 function Dashboard() {
-  // Placeholder data for now
-  const accounts = [
-    {
-      id: 1,
-      name: 'Transaction',
-      balance: 1240,
-      dueOnPay: 450,
-    },
-    {
-      id: 2,
-      name: 'Savings',
-      balance: 8500,
-      dueOnPay: 150,
-    },
-    {
-      id: 3,
-      name: 'Bills',
-      balance: 320,
-      dueOnPay: 620,
-    },
-    {
-      id: 4,
-      name: 'Car',
-      balance: 1900,
-      dueOnPay: 80,
-    },
-  ];
+  const { dashboard } =
+    useApp();
 
-  const disposableIncome = 742.5;
-
-  const totalAllocation = 50 + 30 + 20;
+  const {
+    disposableIncome,
+    paydayAllocation,
+    budgetSplit,
+  } = dashboard;
 
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">Dashboard</h1>
+        <h1 className="page-title">
+          Dashboard
+        </h1>
+
         <p className="page-subtitle">
-          Your next pay breakdown and spending overview.
+          Your next pay breakdown
+          and spending overview.
         </p>
       </div>
 
       <div className="dashboard-grid">
-        {/* Accounts + Due On Pay */}
+        {/* Accounts */}
         <div className="card">
           <div className="card-header">
-            <h2>Accounts</h2>
+            <h2>
+              Due Next Pay
+            </h2>
+
             <p className="page-subtitle">
-              Amount due next payday
+              Account funding
             </p>
           </div>
 
           <div className="account-list">
-            {accounts.map((account) => (
-              <div
-                key={account.id}
-                className="account-row"
-              >
-                <div>
-                  <p className="account-name">
-                    {account.name}
-                  </p>
-                  <p className="account-balance">
-                    $
-                    {account.balance.toLocaleString()}
-                  </p>
-                </div>
+            {paydayAllocation.allocations.map(
+              (
+                account
+              ) => (
+                <div
+                  key={
+                    account.accountId
+                  }
+                  className="account-row"
+                >
+                  <div>
+                    <p className="account-name">
+                      {
+                        account.accountName
+                      }
+                    </p>
 
-                <div className="account-due">
-                  +$
-                  {account.dueOnPay.toLocaleString()}
+                    <p className="account-balance">
+                      Current: $
+                      {account.currentBalance.toLocaleString()}
+                    </p>
+                  </div>
+
+                  <div className="account-due">
+                    +$
+                    {account.amountDue.toLocaleString()}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            )}
           </div>
         </div>
 
-        {/* Disposable Income */}
+        {/* Disposable */}
         <div className="card disposable-card">
           <p className="card-label">
             Disposable Income
@@ -92,8 +87,8 @@ function Dashboard() {
           </h2>
 
           <p className="page-subtitle">
-            Available after bills and
-            savings
+            Available after
+            expenses
           </p>
         </div>
       </div>
@@ -101,10 +96,9 @@ function Dashboard() {
       {/* Budget Split */}
       <div className="card budget-card">
         <div className="card-header">
-          <h2>50 / 30 / 20 Budget</h2>
-          <p className="page-subtitle">
-            Needs, wants and savings split
-          </p>
+          <h2>
+            50 / 30 / 20 Budget
+          </h2>
         </div>
 
         <div className="budget-split">
@@ -112,21 +106,45 @@ function Dashboard() {
             <div className="budget-circle need">
               50%
             </div>
+
             <h3>Need</h3>
+
+            <p>
+              $
+              {budgetSplit.need.toFixed(
+                0
+              )}
+            </p>
           </div>
 
           <div className="budget-item">
             <div className="budget-circle want">
               30%
             </div>
+
             <h3>Want</h3>
+
+            <p>
+              $
+              {budgetSplit.want.toFixed(
+                0
+              )}
+            </p>
           </div>
 
           <div className="budget-item">
             <div className="budget-circle save">
               20%
             </div>
+
             <h3>Save</h3>
+
+            <p>
+              $
+              {budgetSplit.save.toFixed(
+                0
+              )}
+            </p>
           </div>
         </div>
       </div>
