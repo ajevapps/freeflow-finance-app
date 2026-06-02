@@ -1,10 +1,13 @@
-import { Outlet, NavLink } from 'react-router-dom';
+import {
+  Outlet,
+  NavLink,
+} from 'react-router-dom';
 
 function MainLayout() {
   const navItems = [
     {
-      label: 'Home',
-      path: '/',
+      label: 'Dashboard',
+      path: '/dashboard',
       icon: '🏠',
     },
     {
@@ -36,19 +39,55 @@ function MainLayout() {
 
   return (
     <div className="app-shell">
-      {/* Top Header */}
-      <header className="top-bar">
-        <h1 className="app-title">
-          FreeFlow
-        </h1>
-      </header>
+      {/* Desktop Sidebar */}
+      <aside className="sidebar">
+        <div className="sidebar-header">
+          <h1 className="app-title">
+            FreeFlow
+          </h1>
+        </div>
 
-      {/* Main Content */}
-      <main className="page-content">
-        <Outlet />
-      </main>
+        <nav className="sidebar-nav">
+          {navItems.map(
+            (item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({
+                  isActive,
+                }) =>
+                  `nav-item ${
+                    isActive
+                      ? 'active'
+                      : ''
+                  }`
+                }
+              >
+                <span className="nav-icon">
+                  {
+                    item.icon
+                  }
+                </span>
 
-      {/* Bottom Nav */}
+                <span className="nav-label">
+                  {
+                    item.label
+                  }
+                </span>
+              </NavLink>
+            )
+          )}
+        </nav>
+      </aside>
+
+      {/* Main App Area */}
+      <div className="app-main">
+        <main className="page-content">
+          <Outlet />
+        </main>
+      </div>
+
+      {/* Mobile Bottom Nav */}
       <nav className="bottom-nav">
         {navItems.map(
           (item) => (

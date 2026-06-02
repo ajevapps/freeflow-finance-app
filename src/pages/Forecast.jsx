@@ -3,21 +3,26 @@ import { useApp } from '../context/AppContext';
 function Forecast() {
   const {
     dashboard,
-    accounts,
-    expenses,
-    incomes,
-  } = useApp();
+    accounts = [],
+    expenses = [],
+    incomes = [],
+  } = useApp() || {};
 
   const {
-    totalBalance,
-    disposableIncome,
-    paydayAllocation,
-    budgetHealth,
-  } = dashboard;
+    totalBalance = 0,
+    disposableIncome = 0,
+    paydayAllocation = {
+      totalDue: 0,
+    },
+    budgetHealth = {
+      status: 'healthy',
+      message: 'No issues detected',
+    },
+  } = dashboard || {};
 
   const projectedBalance =
     totalBalance -
-    paydayAllocation.totalDue;
+    (paydayAllocation?.totalDue || 0);
 
   const nextPay =
     incomes.length > 0
@@ -32,9 +37,9 @@ function Forecast() {
     nextPayAmount;
 
   const formatCurrency = (
-    value
+    value = 0
   ) => {
-    return value.toLocaleString(
+    return Number(value).toLocaleString(
       'en-AU',
       {
         style: 'currency',
@@ -46,27 +51,32 @@ function Forecast() {
   const formatDate = (
     date
   ) => {
-    if (!date)
+    if (!date) {
       return 'No pay date';
+    }
 
-    return new Date(
-      date
-    ).toLocaleDateString(
-      'en-AU',
-      {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      }
-    );
+    return new Date(date)
+      .toLocaleDateString(
+        'en-AU',
+        {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        }
+      );
   };
 
   return (
     <div className="page">
       <div className="page-header">
+        <h1>Forecast</h1>
+
+        <p className="page-subtitle">
+          View your predicted balance
+          and cashflow.
+        </p>
       </div>
 
-      {/* Top Summary */}
       <div className="dashboard-grid">
         <div className="card">
           <p className="card-label">
@@ -92,7 +102,7 @@ function Forecast() {
           <h2 className="card-value">
             -
             {formatCurrency(
-              paydayAllocation.totalDue
+              paydayAllocation?.totalDue || 0
             )}
           </h2>
 
@@ -118,7 +128,6 @@ function Forecast() {
         </div>
       </div>
 
-      {/* Timeline */}
       <div
         className="card"
         style={{
@@ -137,8 +146,7 @@ function Forecast() {
               <h3>Today</h3>
 
               <p className="page-subtitle">
-                Current
-                position
+                Current position
               </p>
             </div>
 
@@ -163,7 +171,7 @@ function Forecast() {
             <strong>
               -
               {formatCurrency(
-                paydayAllocation.totalDue
+                paydayAllocation?.totalDue || 0
               )}
             </strong>
           </div>
@@ -198,8 +206,7 @@ function Forecast() {
               </h3>
 
               <p className="page-subtitle">
-                Estimated
-                balance
+                Estimated balance
               </p>
             </div>
 
@@ -212,7 +219,6 @@ function Forecast() {
         </div>
       </div>
 
-      {/* Budget Health */}
       <div
         className="card"
         style={{
@@ -226,29 +232,30 @@ function Forecast() {
         </div>
 
         <div
-          className={`health-card ${budgetHealth.status}`}
+          className={`health-card ${
+            budgetHealth?.status ||
+            'healthy'
+          }`}
         >
           <h3>
-            {budgetHealth.status ===
+            {budgetHealth?.status ===
             'healthy'
               ? 'Healthy'
-              : budgetHealth.status ===
+              : budgetHealth?.status ===
                 'warning'
               ? 'Warning'
               : 'High Risk'}
           </h3>
 
           <p>
-            {
-              budgetHealth.message
-            }
+            {budgetHealth?.message ||
+              'No issues detected'}
           </p>
         </div>
 
         <div
           style={{
-            marginTop:
-              '1rem',
+            marginTop: '1rem',
           }}
         >
           <p className="card-label">
