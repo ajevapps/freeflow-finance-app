@@ -1,4 +1,9 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+
 import { useApp } from '../context/AppContext';
 
 function Expenses() {
@@ -14,8 +19,7 @@ function Expenses() {
     name: '',
     amount: '',
     dueDate: '',
-    frequency:
-      'monthly',
+    frequency: 'monthly',
     category: 'need',
     accountId: '',
   };
@@ -23,9 +27,12 @@ function Expenses() {
   const [form, setForm] =
     useState(emptyForm);
 
+  const [editingId, setEditingId] =
+    useState(null);
+
   const [
-    editingId,
-    setEditingId,
+    selectedExpense,
+    setSelectedExpense,
   ] = useState(null);
 
   const handleChange = (
@@ -126,20 +133,117 @@ function Expenses() {
     );
   };
 
+  // ======================================
+  // RECURRING EVENTS
+  // ======================================
+
+  const calendarEvents =
+    useMemo(() => {
+      const events = [];
+
+      expenses.forEach(
+        (expense) => {
+          const start =
+            new Date(
+              expense.dueDate
+            );
+
+          const end =
+            new Date();
+
+          end.setFullYear(
+            end.getFullYear() +
+              2
+          );
+
+          let current =
+            new Date(
+              start
+            );
+
+          while (
+            current <= end
+          ) {
+            events.push({
+              id: `${expense.id}-${current.toISOString()}`,
+              title: `${expense.name} $${expense.amount}`,
+              date:
+                current
+                  .toISOString()
+                  .split(
+                    'T'
+                  )[0],
+              extendedProps:
+                expense,
+              backgroundColor:
+                expense.category ===
+                'need'
+                  ? '#f59e0b'
+                  : expense.category ===
+                    'want'
+                  ? '#3b82f6'
+                  : '#22c55e',
+            });
+
+            switch (
+              expense.frequency
+            ) {
+              case 'weekly':
+                current.setDate(
+                  current.getDate() +
+                    7
+                );
+                break;
+
+              case 'fortnightly':
+                current.setDate(
+                  current.getDate() +
+                    14
+                );
+                break;
+
+              case 'monthly':
+                current.setMonth(
+                  current.getMonth() +
+                    1
+                );
+                break;
+
+              case 'yearly':
+                current.setFullYear(
+                  current.getFullYear() +
+                    1
+                );
+                break;
+
+              default:
+                current =
+                  new Date(
+                    end
+                  );
+            }
+          }
+        }
+      );
+
+      return events;
+    }, [expenses]);
+
   return (
     <div className="page">
       <div className="page-header">
         <h1 className="page-title">
-          Expenses
+          Expense Planner
         </h1>
 
         <p className="page-subtitle">
-          Manage recurring
-          expenses and payday
-          allocations.
+          Manage bills,
+          subscriptions and
+          recurring expenses.
         </p>
       </div>
 
+      {/* FORM */}
       <div className="card">
         <div className="card-header">
           <h2>
@@ -200,12 +304,15 @@ function Expenses() {
             <option value="weekly">
               Weekly
             </option>
+
             <option value="fortnightly">
               Fortnightly
             </option>
+
             <option value="monthly">
               Monthly
             </option>
+
             <option value="yearly">
               Yearly
             </option>
@@ -223,9 +330,11 @@ function Expenses() {
             <option value="need">
               Need
             </option>
+
             <option value="want">
               Want
             </option>
+
             <option value="save">
               Save
             </option>
@@ -269,109 +378,125 @@ function Expenses() {
             className="primary-button"
           >
             {editingId
-              ? 'Update Expense'
-              : 'Add Expense'}
+              ? 'Update'
+              : 'Add'}
           </button>
-
-          {editingId && (
-            <button
-              type="button"
-              className="danger-button"
-              onClick={
-                resetForm
-              }
-            >
-              Cancel
-            </button>
-          )}
         </form>
       </div>
 
+      {/* CALENDAR */}
       <div
         className="card"
         style={{
           marginTop: '1.5rem',
         }}
       >
-        <div className="card-header">
-          <h2>
-            Your Expenses
-          </h2>
-        </div>
-
-        <div className="account-list">
-          {expenses.map(
-            (
-              expense
-            ) => (
-              <div
-                key={
-                  expense.id
-                }
-                className="account-row"
-              >
-                <div>
-                  <p className="account-name">
-                    {
-                      expense.name
-                    }
-                  </p>
-
-                  <p className="account-balance">
-                    $
-                    {expense.amount.toLocaleString()}
-                    {' • '}
-                    {
-                      expense.frequency
-                    }
-                  </p>
-
-                  <p className="page-subtitle">
-                    Due{' '}
-                    {
-                      expense.dueDate
-                    }
-                    {' • '}
-                    {
-                      expense.category
-                    }
-                    {' • '}
-                    {
-                      getAccountName(
-                        expense.accountId
-                      )
-                    }
-                  </p>
-                </div>
-
-                <div className="account-actions">
-                  <button
-                    className="primary-button"
-                    onClick={() =>
-                      handleEdit(
-                        expense
-                      )
-                    }
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    className="danger-button"
-                    onClick={() =>
-                      deleteExpense(
-                        expense.id
-                      )
-                    }
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
+        <FullCalendar
+          plugins={[
+            dayGridPlugin,
+            interactionPlugin,
+          ]}
+          initialView="dayGridMonth"
+          height="auto"
+          editable
+          events={
+            calendarEvents
+          }
+          eventClick={(
+            info
+          ) =>
+            setSelectedExpense(
+              info.event
+                .extendedProps
             )
-          )}
-        </div>
+          }
+        />
       </div>
+
+      {/* DETAILS */}
+      {selectedExpense && (
+        <div
+          className="card"
+          style={{
+            marginTop:
+              '1.5rem',
+          }}
+        >
+          <h2>
+            Selected Bill
+          </h2>
+
+          <p>
+            <strong>
+              Name:
+            </strong>{' '}
+            {
+              selectedExpense.name
+            }
+          </p>
+
+          <p>
+            <strong>
+              Amount:
+            </strong>{' '}
+            $
+            {
+              selectedExpense.amount
+            }
+          </p>
+
+          <p>
+            <strong>
+              Frequency:
+            </strong>{' '}
+            {
+              selectedExpense.frequency
+            }
+          </p>
+
+          <p>
+            <strong>
+              Account:
+            </strong>{' '}
+            {getAccountName(
+              selectedExpense.accountId
+            )}
+          </p>
+
+          <div
+            className="account-actions"
+            style={{
+              marginTop:
+                '1rem',
+            }}
+          >
+            <button
+              className="primary-button"
+              onClick={() =>
+                handleEdit(
+                  selectedExpense
+                )
+              }
+            >
+              Edit
+            </button>
+
+            <button
+              className="danger-button"
+              onClick={() => {
+                deleteExpense(
+                  selectedExpense.id
+                );
+                setSelectedExpense(
+                  null
+                );
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
