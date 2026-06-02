@@ -309,7 +309,7 @@ export function AppProvider({
         accounts,
         expenses,
         incomes,
-        settings.payFrequency
+        settings?.payFrequency
       );
     }, [
       accounts,
