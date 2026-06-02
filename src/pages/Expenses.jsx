@@ -232,15 +232,6 @@ function Expenses() {
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">
-          Expense Planner
-        </h1>
-
-        <p className="page-subtitle">
-          Manage bills,
-          subscriptions and
-          recurring expenses.
-        </p>
       </div>
 
       {/* FORM */}

@@ -37,15 +37,6 @@ function Accounts() {
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">
-          Accounts
-        </h1>
-
-        <p className="page-subtitle">
-          Manage the accounts used
-          for budgeting and payday
-          allocations.
-        </p>
       </div>
 
       {/* Add Account */}

@@ -1,151 +1,267 @@
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+
 import { useApp } from '../context/AppContext';
 
 function Dashboard() {
-  const { dashboard } =
-    useApp();
+  const {
+    dashboard,
+    expenses,
+    accounts,
+    settings,
+  } = useApp();
 
   const {
+    totalBalance,
+    incomeThisPay,
+    billsThisPay,
     disposableIncome,
-    paydayAllocation,
-    budgetSplit,
+    budgetHealth,
   } = dashboard;
+
+  const categoryTotals =
+    expenses.reduce(
+      (totals, expense) => {
+        const amount =
+          Number(
+            expense.amount
+          ) || 0;
+
+        totals[
+          expense.category
+        ] += amount;
+
+        return totals;
+      },
+      {
+        need: 0,
+        want: 0,
+        save: 0,
+      }
+    );
+
+  const chartData = [
+    {
+      name: 'Need',
+      value:
+        categoryTotals.need,
+    },
+    {
+      name: 'Want',
+      value:
+        categoryTotals.want,
+    },
+    {
+      name: 'Save',
+      value:
+        categoryTotals.save,
+    },
+  ];
+
+  const COLORS = [
+    '#f59e0b',
+    '#3b82f6',
+    '#22c55e',
+  ];
+
+  const formatCurrency = (
+    value
+  ) =>
+    value.toLocaleString(
+      'en-AU',
+      {
+        style: 'currency',
+        currency: 'AUD',
+      }
+    );
 
   return (
     <div className="page">
-      <div className="page-header">
-        <h1 className="page-title">
-          Dashboard
-        </h1>
-
-        <p className="page-subtitle">
-          Your next pay breakdown
-          and spending overview.
-        </p>
-      </div>
-
+      {/* TOP CARDS */}
       <div className="dashboard-grid">
-        {/* Accounts */}
         <div className="card">
-          <div className="card-header">
-            <h2>
-              Due Next Pay
-            </h2>
-
-            <p className="page-subtitle">
-              Account funding
-            </p>
-          </div>
-
-          <div className="account-list">
-            {paydayAllocation.allocations.map(
-              (
-                account
-              ) => (
-                <div
-                  key={
-                    account.accountId
-                  }
-                  className="account-row"
-                >
-                  <div>
-                    <p className="account-name">
-                      {
-                        account.accountName
-                      }
-                    </p>
-
-                    <p className="account-balance">
-                      Current: $
-                      {account.currentBalance.toLocaleString()}
-                    </p>
-                  </div>
-
-                  <div className="account-due">
-                    +$
-                    {account.amountDue.toLocaleString()}
-                  </div>
-                </div>
-              )
-            )}
-          </div>
-        </div>
-
-        {/* Disposable */}
-        <div className="card disposable-card">
           <p className="card-label">
-            Disposable Income
+            Income This Pay
           </p>
 
           <h2 className="card-value">
-            $
-            {disposableIncome.toLocaleString(
-              undefined,
-              {
-                minimumFractionDigits: 2,
-              }
+            {formatCurrency(
+              incomeThisPay
             )}
           </h2>
 
           <p className="page-subtitle">
-            Available after
-            expenses
+            {
+              settings.payFrequency
+            } income
+          </p>
+        </div>
+
+        <div className="card">
+          <p className="card-label">
+            Bills This Pay
+          </p>
+
+          <h2 className="card-value">
+            {formatCurrency(
+              billsThisPay
+            )}
+          </h2>
+
+          <p className="page-subtitle">
+            Split across your
+            pay cycle
+          </p>
+        </div>
+
+        <div className="card">
+          <p className="card-label">
+            Disposable
+          </p>
+
+          <h2 className="card-value">
+            {formatCurrency(
+              disposableIncome
+            )}
+          </h2>
+
+          <p className="page-subtitle">
+            After allocations
           </p>
         </div>
       </div>
 
-      {/* Budget Split */}
-      <div className="card budget-card">
+      {/* ACCOUNTS */}
+      <div
+        className="card"
+        style={{
+          marginTop: '1.5rem',
+        }}
+      >
         <div className="card-header">
           <h2>
-            50 / 30 / 20 Budget
+            Fund These
+            Accounts
           </h2>
         </div>
 
-        <div className="budget-split">
-          <div className="budget-item">
-            <div className="budget-circle need">
-              50%
-            </div>
+        <div className="account-list">
+          {accounts.map(
+            (account) => (
+              <div
+                key={
+                  account.id
+                }
+                className="account-row"
+              >
+                <div>
+                  <p className="account-name">
+                    {
+                      account.name
+                    }
+                  </p>
 
-            <h3>Need</h3>
+                  <p className="page-subtitle">
+                    Current
+                    balance
+                  </p>
+                </div>
 
-            <p>
-              $
-              {budgetSplit.need.toFixed(
-                0
-              )}
-            </p>
-          </div>
+                <strong>
+                  {formatCurrency(
+                    account.balance
+                  )}
+                </strong>
+              </div>
+            )
+          )}
+        </div>
+      </div>
 
-          <div className="budget-item">
-            <div className="budget-circle want">
-              30%
-            </div>
+      {/* BUDGET HEALTH */}
+      <div
+        className="card"
+        style={{
+          marginTop: '1.5rem',
+        }}
+      >
+        <div className="card-header">
+          <h2>
+            Budget Health
+          </h2>
+        </div>
 
-            <h3>Want</h3>
+        <div
+          className={`health-card ${budgetHealth.status}`}
+        >
+          <h3>
+            {budgetHealth.status ===
+            'healthy'
+              ? 'Healthy'
+              : budgetHealth.status ===
+                'warning'
+              ? 'Warning'
+              : 'High Risk'}
+          </h3>
 
-            <p>
-              $
-              {budgetSplit.want.toFixed(
-                0
-              )}
-            </p>
-          </div>
+          <p>
+            {
+              budgetHealth.message
+            }
+          </p>
+        </div>
+      </div>
 
-          <div className="budget-item">
-            <div className="budget-circle save">
-              20%
-            </div>
+      {/* SPENDING SPLIT */}
+      <div
+        className="card"
+        style={{
+          marginTop: '1.5rem',
+        }}
+      >
+        <div className="card-header">
+          <h2>
+            Need / Want /
+            Save
+          </h2>
+        </div>
 
-            <h3>Save</h3>
+        <div
+          style={{
+            width: '100%',
+            height: 300,
+          }}
+        >
+          <ResponsiveContainer>
+            <PieChart>
+              <Pie
+                data={
+                  chartData
+                }
+                dataKey="value"
+                outerRadius={
+                  100
+                }
+              >
+                {chartData.map(
+                  (
+                    entry,
+                    index
+                  ) => (
+                    <Cell
+                      key={index}
+                      fill={
+                        COLORS[
+                          index
+                        ]
+                      }
+                    />
+                  )
+                )}
+              </Pie>
 
-            <p>
-              $
-              {budgetSplit.save.toFixed(
-                0
-              )}
-            </p>
-          </div>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>

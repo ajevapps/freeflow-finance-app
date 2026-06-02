@@ -14,7 +14,7 @@ const AppContext =
   createContext();
 
 // ======================================
-// STORAGE KEYS
+// STORAGE
 // ======================================
 
 const STORAGE_KEYS = {
@@ -26,11 +26,10 @@ const STORAGE_KEYS = {
 
   incomes:
     'freeflow_incomes',
-};
 
-// ======================================
-// STORAGE HELPERS
-// ======================================
+  settings:
+    'freeflow_settings',
+};
 
 function loadStorage(
   key,
@@ -42,11 +41,9 @@ function loadStorage(
         key
       );
 
-    if (data) {
-      return JSON.parse(data);
-    }
-
-    return fallback;
+    return data
+      ? JSON.parse(data)
+      : fallback;
   } catch {
     return fallback;
   }
@@ -61,10 +58,6 @@ function saveStorage(
     JSON.stringify(data)
   );
 }
-
-// ======================================
-// CONTEXT PROVIDER
-// ======================================
 
 export function AppProvider({
   children,
@@ -106,46 +99,7 @@ export function AppProvider({
     useState(() =>
       loadStorage(
         STORAGE_KEYS.expenses,
-        [
-          {
-            id: 1,
-            name: 'Rent',
-            amount: 650,
-            dueDate:
-              '2026-06-15',
-            frequency:
-              'fortnightly',
-            category:
-              'need',
-            accountId: 2,
-          },
-          {
-            id: 2,
-            name:
-              'Netflix',
-            amount: 22,
-            dueDate:
-              '2026-06-09',
-            frequency:
-              'monthly',
-            category:
-              'want',
-            accountId: 2,
-          },
-          {
-            id: 3,
-            name:
-              'Emergency Fund',
-            amount: 150,
-            dueDate:
-              '2026-06-14',
-            frequency:
-              'monthly',
-            category:
-              'save',
-            accountId: 3,
-          },
-        ]
+        []
       )
     );
 
@@ -153,22 +107,23 @@ export function AppProvider({
     useState(() =>
       loadStorage(
         STORAGE_KEYS.incomes,
-        [
-          {
-            id: 1,
-            name: 'Salary',
-            amount: 2800,
-            frequency:
-              'fortnightly',
-            nextPayDate:
-              '2026-06-15',
-          },
-        ]
+        []
+      )
+    );
+
+  const [settings, setSettings] =
+    useState(() =>
+      loadStorage(
+        STORAGE_KEYS.settings,
+        {
+          payFrequency:
+            'fortnightly',
+        }
       )
     );
 
   // ======================================
-  // AUTO SAVE
+  // PERSISTENCE
   // ======================================
 
   useEffect(() => {
@@ -192,6 +147,13 @@ export function AppProvider({
     );
   }, [incomes]);
 
+  useEffect(() => {
+    saveStorage(
+      STORAGE_KEYS.settings,
+      settings
+    );
+  }, [settings]);
+
   // ======================================
   // ACCOUNT CRUD
   // ======================================
@@ -204,7 +166,6 @@ export function AppProvider({
       {
         id:
           crypto.randomUUID(),
-        balance: 0,
         ...account,
       },
     ]);
@@ -326,7 +287,20 @@ export function AppProvider({
   };
 
   // ======================================
-  // LIVE CALCULATIONS
+  // SETTINGS
+  // ======================================
+
+  const updateSettings = (
+    updates
+  ) => {
+    setSettings((prev) => ({
+      ...prev,
+      ...updates,
+    }));
+  };
+
+  // ======================================
+  // DASHBOARD
   // ======================================
 
   const dashboard =
@@ -334,46 +308,37 @@ export function AppProvider({
       return getDashboardSummary(
         accounts,
         expenses,
-        incomes
+        incomes,
+        settings.payFrequency
       );
     }, [
       accounts,
       expenses,
       incomes,
+      settings,
     ]);
 
-  // ======================================
-  // CONTEXT VALUE
-  // ======================================
-
   const value = {
-    // State
     accounts,
     expenses,
     incomes,
+    settings,
 
-    // Setters
-    setAccounts,
-    setExpenses,
-    setIncomes,
+    dashboard,
 
-    // Account CRUD
     addAccount,
     updateAccount,
     deleteAccount,
 
-    // Expense CRUD
     addExpense,
     updateExpense,
     deleteExpense,
 
-    // Income CRUD
     addIncome,
     updateIncome,
     deleteIncome,
 
-    // Dashboard
-    dashboard,
+    updateSettings,
   };
 
   return (

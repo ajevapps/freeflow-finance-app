@@ -3,14 +3,6 @@ export default function Reports() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">
-          Reports
-        </h1>
-
-        <p className="text-gray-500 mt-1">
-          Analyse trends, spending,
-          savings, and financial performance.
-        </p>
       </div>
 
       {/* Placeholder Content */}

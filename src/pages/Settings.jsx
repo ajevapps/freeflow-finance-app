@@ -1,28 +1,93 @@
-export default function Settings() {
+import { useApp } from '../context/AppContext';
+
+function Settings() {
+  const {
+    settings,
+    updateSettings,
+  } = useApp();
+
+  const handleReset = () => {
+    const confirmed =
+      window.confirm(
+        'Reset all FreeFlow data?'
+      );
+
+    if (!confirmed)
+      return;
+
+    localStorage.clear();
+
+    window.location.reload();
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">
-          Settings
-        </h1>
+    <div className="page">
+      <div className="settings-grid">
+        <div className="card">
+          <div className="card-header">
+            <h2>
+              Pay Cycle
+            </h2>
+          </div>
 
-        <p className="text-gray-500 mt-1">
-          Manage preferences, currency,
-          app behaviour, and account settings.
-        </p>
-      </div>
+          <p className="page-subtitle">
+            Choose your
+            primary pay
+            frequency.
+          </p>
 
-      {/* Placeholder Content */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-800">
-          App Settings
-        </h2>
+          <select
+            value={
+              settings.payFrequency
+            }
+            onChange={(
+              e
+            ) =>
+              updateSettings({
+                payFrequency:
+                  e.target
+                    .value,
+              })
+            }
+          >
+            <option value="weekly">
+              Weekly
+            </option>
 
-        <p className="text-gray-500 mt-2">
-          Settings options will appear here.
-        </p>
+            <option value="fortnightly">
+              Fortnightly
+            </option>
+
+            <option value="monthly">
+              Monthly
+            </option>
+          </select>
+        </div>
+
+        <div className="card">
+          <div className="card-header">
+            <h2>
+              Data
+            </h2>
+          </div>
+
+          <p className="page-subtitle">
+            Reset all stored
+            FreeFlow data.
+          </p>
+
+          <button
+            className="danger-button"
+            onClick={
+              handleReset
+            }
+          >
+            Reset App
+          </button>
+        </div>
       </div>
     </div>
   );
 }
+
+export default Settings;

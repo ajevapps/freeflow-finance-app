@@ -64,15 +64,6 @@ function Forecast() {
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">
-          Forecast
-        </h1>
-
-        <p className="page-subtitle">
-          See your future cash
-          position and upcoming
-          financial pressure.
-        </p>
       </div>
 
       {/* Top Summary */}
