@@ -1,31 +1,23 @@
 {
   "name": "freeflow-finance-app",
   "private": true,
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
+  "homepage": "https://jackeveritt9.github.io/freeflow-finance-app/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
-    "@fullcalendar/core": "^6.1.20",
-    "@fullcalendar/daygrid": "^6.1.20",
-    "@fullcalendar/interaction": "^6.1.20",
-    "@fullcalendar/react": "^6.1.20",
-    "date-fns": "^4.4.0",
     "react": "^18.3.1",
-    "react-big-calendar": "^1.20.0",
-    "react-calendar": "^6.0.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.30.4",
-    "recharts": "^3.8.1"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^6.0.2",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.14",
-    "vite": "^8.0.16"
+    "@vitejs/plugin-react": "^4.3.1",
+    "gh-pages": "^6.1.1",
+    "vite": "^5.4.0"
   }
 }
