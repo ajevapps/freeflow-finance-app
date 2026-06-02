@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { useApp } from '../context/AppContext';
 import { calculateNetIncome } from '../utils/calculations';
 
@@ -17,7 +18,7 @@ function Income() {
     nextPayDate: '',
     calculateTax: true,
     includeMedicare: true,
-    hasHecs: false,
+    hasHecs: null,
   };
 
   const [form, setForm] =
@@ -26,7 +27,9 @@ function Income() {
   const [editingId, setEditingId] =
     useState(null);
 
-  const handleChange = (e) => {
+  const handleChange = (
+    e
+  ) => {
     const {
       name,
       value,
@@ -48,7 +51,9 @@ function Income() {
     setEditingId(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (
+    e
+  ) => {
     e.preventDefault();
 
     if (
@@ -101,7 +106,7 @@ function Income() {
         true,
       hasHecs:
         income.hasHecs ??
-        false,
+        null,
     });
 
     window.scrollTo({
@@ -121,9 +126,11 @@ function Income() {
     });
 
   const formatCurrency = (
-    value
+    value = 0
   ) =>
-    value.toLocaleString(
+    Number(
+      value || 0
+    ).toLocaleString(
       'en-AU',
       {
         style: 'currency',
@@ -147,9 +154,6 @@ function Income() {
 
   return (
     <div className="page">
-      <div className="page-header">
-      </div>
-
       {/* FORM */}
       <div className="card">
         <div className="card-header">
@@ -179,7 +183,7 @@ function Income() {
           <input
             type="number"
             name="amount"
-            placeholder="Gross amount"
+            placeholder="Gross pay"
             value={
               form.amount
             }
@@ -207,10 +211,6 @@ function Income() {
 
             <option value="monthly">
               Monthly
-            </option>
-
-            <option value="yearly">
-              Yearly
             </option>
           </select>
 
@@ -248,7 +248,7 @@ function Income() {
                 handleChange
               }
             />
-            Income Tax
+            PAYG Tax
           </label>
 
           <label>
@@ -270,7 +270,8 @@ function Income() {
               type="checkbox"
               name="hasHecs"
               checked={
-                form.hasHecs
+                form.hasHecs ??
+                false
               }
               onChange={
                 handleChange
@@ -280,29 +281,35 @@ function Income() {
           </label>
         </div>
 
-        {/* LIVE PREVIEW */}
+        <p className="page-subtitle">
+          HECS automatically
+          assumed above ~$67k
+          annual income.
+        </p>
+
+        {/* PAY PREVIEW */}
         <div className="tax-preview">
           <div>
             <span>
-              Gross Annual
+              Gross This Pay
             </span>
 
             <strong>
               {formatCurrency(
-                taxPreview.grossAnnual
+                taxPreview.grossPay
               )}
             </strong>
           </div>
 
           <div>
             <span>
-              Income Tax
+              Tax Withheld
             </span>
 
             <strong>
               -
               {formatCurrency(
-                taxPreview.taxAnnual
+                taxPreview.taxPerPay
               )}
             </strong>
           </div>
@@ -315,30 +322,32 @@ function Income() {
             <strong>
               -
               {formatCurrency(
-                taxPreview.medicareAnnual
+                taxPreview.medicarePerPay
               )}
             </strong>
           </div>
 
           <div>
-            <span>HECS</span>
+            <span>
+              HECS
+            </span>
 
             <strong>
               -
               {formatCurrency(
-                taxPreview.hecsAnnual
+                taxPreview.hecsPerPay
               )}
             </strong>
           </div>
 
           <div className="net-pay">
             <span>
-              Net Annual
+              Take Home Pay
             </span>
 
             <strong>
               {formatCurrency(
-                taxPreview.netAnnual
+                taxPreview.netPay
               )}
             </strong>
           </div>
@@ -361,7 +370,7 @@ function Income() {
         {incomes.length ===
         0 ? (
           <p className="page-subtitle">
-            No income added yet.
+            No income added.
           </p>
         ) : (
           <div className="account-list">
@@ -400,10 +409,9 @@ function Income() {
                       </p>
 
                       <p className="page-subtitle">
-                        Net Monthly:{' '}
+                        Take Home:{' '}
                         {formatCurrency(
-                          net.netAnnual /
-                            12
+                          net.netPay
                         )}
                       </p>
 
@@ -417,7 +425,6 @@ function Income() {
 
                     <div className="account-actions">
                       <button
-                        type="button"
                         className="primary-button"
                         onClick={() =>
                           handleEdit(
@@ -429,7 +436,6 @@ function Income() {
                       </button>
 
                       <button
-                        type="button"
                         className="danger-button"
                         onClick={() =>
                           deleteIncome(

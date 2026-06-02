@@ -47,6 +47,7 @@ export function getPaysInMonth(
         month
       ) {
         payCount++;
+
         current.setDate(
           current.getDate() +
             14
@@ -68,59 +69,91 @@ export function getPaysInMonth(
 }
 
 // ======================================
-// AUSTRALIAN TAX ENGINE
+// PAY PERIODS
+// ======================================
+
+export function getPaysPerYear(
+  payFrequency =
+    'fortnightly'
+) {
+  switch (
+    payFrequency
+  ) {
+    case 'weekly':
+      return 52;
+
+    case 'fortnightly':
+      return 26;
+
+    case 'monthly':
+      return 12;
+
+    default:
+      return 26;
+  }
+}
+
+// ======================================
+// AUSTRALIAN TAX
 // ======================================
 
 export function calculateIncomeTax(
-  annualIncome = 0
+  grossPay = 0,
+  payFrequency =
+    'fortnightly'
 ) {
+  const annualIncome =
+    grossPay *
+    getPaysPerYear(
+      payFrequency
+    );
+
+  let annualTax = 0;
+
   if (
     annualIncome <=
     18200
   ) {
-    return 0;
-  }
-
-  if (
+    annualTax = 0;
+  } else if (
     annualIncome <=
     45000
   ) {
-    return (
+    annualTax =
       (annualIncome -
         18200) *
-      0.16
-    );
-  }
-
-  if (
+      0.16;
+  } else if (
     annualIncome <=
     135000
   ) {
-    return (
+    annualTax =
       4288 +
       (annualIncome -
         45000) *
-        0.30
-    );
-  }
-
-  if (
+        0.30;
+  } else if (
     annualIncome <=
     190000
   ) {
-    return (
+    annualTax =
       31288 +
       (annualIncome -
         135000) *
-        0.37
-    );
+        0.37;
+  } else {
+    annualTax =
+      51638 +
+      (annualIncome -
+        190000) *
+        0.45;
   }
 
   return (
-    51638 +
-    (annualIncome -
-      190000) *
-      0.45
+    annualTax /
+    getPaysPerYear(
+      payFrequency
+    )
   );
 }
 
@@ -244,55 +277,68 @@ export function calculateAnnualAmount(
 }
 
 // ======================================
-// NET INCOME
+// NET PAY
 // ======================================
 
 export function calculateNetIncome(
   income
 ) {
-  const grossAnnual =
+  const grossPay =
+    Number(
+      income.amount
+    ) || 0;
+
+  const annualIncome =
     calculateAnnualAmount(
-      income.amount,
+      grossPay,
+      income.frequency
+    );
+
+  const paysPerYear =
+    getPaysPerYear(
       income.frequency
     );
 
   const tax =
     income.calculateTax
       ? calculateIncomeTax(
-          grossAnnual
+          grossPay,
+          income.frequency
         )
       : 0;
 
   const medicare =
-    calculateMedicareLevy(
-      grossAnnual,
-      income.includeMedicare
-    );
+    income.includeMedicare
+      ? calculateMedicareLevy(
+          annualIncome
+        ) /
+        paysPerYear
+      : 0;
 
   const hecs =
     calculateHECS(
-      grossAnnual,
+      annualIncome,
       income.hasHecs
-    );
+    ) / paysPerYear;
 
-  const netAnnual =
-    grossAnnual -
+  const netPay =
+    grossPay -
     tax -
     medicare -
     hecs;
 
   return {
-    grossAnnual,
-    taxAnnual: tax,
-    medicareAnnual:
+    grossPay,
+    taxPerPay: tax,
+    medicarePerPay:
       medicare,
-    hecsAnnual: hecs,
-    netAnnual,
+    hecsPerPay: hecs,
+    netPay,
   };
 }
 
 // ======================================
-// PAY CYCLE ENGINE
+// EXPENSES PER PAY
 // ======================================
 
 export function calculateExpensePerPay(
@@ -313,11 +359,9 @@ export function calculateExpensePerPay(
   switch (
     expense.frequency
   ) {
-    // same cycle
     case payFrequency:
       return amount;
 
-    // weekly
     case 'weekly':
       return payFrequency ===
         'fortnightly'
@@ -327,29 +371,19 @@ export function calculateExpensePerPay(
         ? amount * 4.33
         : amount;
 
-    // monthly
     case 'monthly':
       return (
         amount /
         paysInMonth
       );
 
-    // yearly
-    case 'yearly': {
-      const yearlyPays =
-        payFrequency ===
-        'weekly'
-          ? 52
-          : payFrequency ===
-            'fortnightly'
-          ? 26
-          : 12;
-
+    case 'yearly':
       return (
         amount /
-        yearlyPays
+        getPaysPerYear(
+          payFrequency
+        )
       );
-    }
 
     default:
       return amount;
@@ -357,7 +391,7 @@ export function calculateExpensePerPay(
 }
 
 // ======================================
-// PAYDAY TOTALS
+// TOTALS
 // ======================================
 
 export function calculateBillsThisPay(
@@ -382,10 +416,7 @@ export function calculateIncomeThisPay(
     'fortnightly'
 ) {
   return incomes.reduce(
-    (
-      sum,
-      income
-    ) => {
+    (sum, income) => {
       const net =
         calculateNetIncome(
           income
@@ -397,7 +428,7 @@ export function calculateIncomeThisPay(
         case payFrequency:
           return (
             sum +
-            income.amount
+            net.netPay
           );
 
         case 'weekly':
@@ -405,16 +436,16 @@ export function calculateIncomeThisPay(
             sum +
             (payFrequency ===
             'fortnightly'
-              ? income.amount *
+              ? net.netPay *
                 2
-              : income.amount *
+              : net.netPay *
                 4.33)
           );
 
         case 'monthly':
           return (
             sum +
-            income.amount /
+            net.netPay /
               getPaysInMonth(
                 payFrequency
               )
@@ -423,20 +454,16 @@ export function calculateIncomeThisPay(
         case 'yearly':
           return (
             sum +
-            net.netAnnual /
-              (payFrequency ===
-              'weekly'
-                ? 52
-                : payFrequency ===
-                  'fortnightly'
-                ? 26
-                : 12)
+            net.netPay /
+              getPaysPerYear(
+                payFrequency
+              )
           );
 
         default:
           return (
             sum +
-            income.amount
+            net.netPay
           );
       }
     },
